@@ -5,7 +5,7 @@ Command Line interface application for reading and updating a multivalue diction
 
 ## Built With
 * [.NET 6](https://dotnet.microsoft.com/en-us/download/dotnet/6.0)
-* [Visual Studio 2022] (https://visualstudio.microsoft.com/vs/)
+* [Visual Studio 2022](https://visualstudio.microsoft.com/vs/)
 
 ## Installation
 1. Clone the repository
@@ -19,14 +19,14 @@ The program runs in a continuous loop awaitng input from the command line.
 Type a command, add parameters, and press enter.
 
 Commands
-* add <key> <member>
+* add \<key\> \<member\>
 * allmembers
 * clear
 * exit
 * items
 * keys
-* keyexists <key>
-* members <key>
-* memberexists <key> <member>
-* remove <key> <member>
-* removeall <key>
+* keyexists \<key\>
+* members \<key\>
+* memberexists \<key\> \<member\>
+* remove \<key\> \<member\>
+* removeall \<key\>

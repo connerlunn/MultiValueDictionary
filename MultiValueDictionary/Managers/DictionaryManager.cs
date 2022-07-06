@@ -11,19 +11,16 @@
             if (!KeyExists(key))
             {
                 Dict.Add(key, new List<string>() { member });
-                output.Add("Added");
+                output.Add(") Added");
             }
             else if (!MemberExists(key, member))
             {
-                //var members = Dict[key];
-                //members.Add(member);
-                //Dict.Add(key, members);
                 Dict[key].Add(member);
-                output.Add("Added");
+                output.Add(") Added");
             }
             else
             {
-                output.Add("ERROR, member already exists for key");
+                output.Add(") ERROR, member already exists for key");
             }
             return output;
         }
@@ -35,11 +32,11 @@
 
             if (!KeyExists(key))
             {
-                output.Add("ERROR, key does not exist");
+                output.Add(") ERROR, key does not exist");
             }
             else if (!MemberExists(key, member))
             {
-                output.Add("ERROR, member does not exist");
+                output.Add(") ERROR, member does not exist");
             }
             else
             {
@@ -49,6 +46,8 @@
                 {
                     return RemoveAll(key);
                 }
+
+                output.Add(") Removed");
             }
 
             return output;
@@ -61,11 +60,11 @@
             if (KeyExists(key))
             {
                 Dict.Remove(key);
-                output.Add("Removed");
+                output.Add(") Removed");
             }
             else
             {
-                output.Add("ERROR, key does not exist");
+                output.Add(") ERROR, key does not exist");
             }
             return output;
         }
@@ -73,15 +72,27 @@
         public List<string> Clear()
         {
             Dict = new Dictionary<string, List<string>>();
-            return new List<string>() { "Cleared" };
+            return new List<string>() { ") Cleared" };
         }
 
         public List<string> Keys()
         {
-            bool count = (Dict.Keys.Count > 0);
-            List<string> keys = Dict.Keys.ToList();
+            var output = new List<string>();
 
-            return (Dict.Keys.Count > 0) ? Dict.Keys.ToList() : new List<string>() { "(empty set)" };
+            if (Dict.Keys.Count > 0)
+            {
+                int i = 1;
+                foreach (string key in Dict.Keys.ToList())
+                {
+                    output.Add($"{i}) {key}");
+                    i++;
+                }
+            }
+            else
+            {
+                output.Add("(empty set)");
+            }
+            return output;
         }
 
         public bool KeyExists(string key)
@@ -95,11 +106,16 @@
 
             if (KeyExists(key))
             {
-                output.AddRange(Dict[key]);
+                int i = 1;
+                foreach (string member in Dict[key])
+                {
+                    output.Add($"{i}) {member}");
+                    i++;
+                }
             }
             else
             {
-                output.Add("ERROR, key does not exist");
+                output.Add(") ERROR, key does not exist");
             }
 
             return output;
@@ -107,7 +123,7 @@
 
         public bool MemberExists(string key, string member)
         {
-            return (KeyExists(key) && Dict[key].Contains(member));
+            return KeyExists(key) && Dict[key].Contains(member);
         }
 
         public List<string> AllMembers()
@@ -118,9 +134,14 @@
 
             if (dictKeys.Count > 0)
             {
+                int i = 1;
                 foreach (var key in dictKeys)
                 {
-                    output.AddRange(Dict[key]);
+                    foreach (string member in Dict[key])
+                    {
+                        output.Add($"{i}) {member}");
+                        i++;
+                    }
                 }
             }
             else
@@ -139,10 +160,14 @@
 
             if (dictKeys.Count > 0)
             {
-                output.AddRange(dictKeys);
+                int i = 1;
                 foreach (var key in dictKeys)
                 {
-                    output.AddRange(Dict[key]);
+                    foreach (string member in Dict[key])
+                    {
+                        output.Add($"{i}) {key}: {member}");
+                        i++;
+                    }
                 }
             }
             else

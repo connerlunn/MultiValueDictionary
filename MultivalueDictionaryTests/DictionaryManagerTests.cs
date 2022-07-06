@@ -23,9 +23,9 @@
             Assert.IsTrue(dictionaryManager.Dict.ContainsKey("b"));
             Assert.IsTrue(dictionaryManager.Dict["a"].Contains("b"));
             Assert.IsTrue(dictionaryManager.Dict["a"].Contains("c"));
-            Assert.IsTrue(response1[0] == "Added");
-            Assert.IsTrue(response2[0] == "Added");
-            Assert.IsTrue(response3[0] == "Added");
+            Assert.IsTrue(response1[0] == ") Added");
+            Assert.IsTrue(response2[0] == ") Added");
+            Assert.IsTrue(response3[0] == ") Added");
         }
 
         [TestMethod]
@@ -39,8 +39,8 @@
             var response2 = dictionaryManager.Add("a", "b");
 
             //Assert
-            Assert.IsTrue(response1[0] == "Added");
-            Assert.IsTrue(response2[0] == "ERROR, member already exists for key");
+            Assert.IsTrue(response1[0] == ") Added");
+            Assert.IsTrue(response2[0] == ") ERROR, member already exists for key");
         }
 
         [TestMethod]
@@ -55,7 +55,7 @@
             var response = dictionaryManager.Keys();
 
             //Assert
-            Assert.IsTrue(response[0] == "a" && response[1] == "b");
+            Assert.IsTrue(response[0] == "1) a" && response[1] == "2) b");
         }
 
         [TestMethod]
@@ -82,7 +82,7 @@
             var response = dictionaryManager.Members("a");
 
             //Assert
-            Assert.IsTrue(response.Contains("a") && response.Contains("b"));
+            Assert.IsTrue(response.Contains("1) a") && response.Contains("2) b"));
         }
 
         [TestMethod]
@@ -95,19 +95,36 @@
             var response = dictionaryManager.Members("a");
 
             //Assert
-            Assert.IsTrue(response[0] == "ERROR, key does not exist");
+            Assert.IsTrue(response[0] == ") ERROR, key does not exist");
         }
 
         [TestMethod]
         public void Remove_Succeeds()
         {
+            //Arrange
+            var dictionaryManager = new DictionaryManager();
+            dictionaryManager.Dict.Add("a", new List<string>() { "a", "b" });
 
+            //Act
+            var response = dictionaryManager.Remove("a", "a");
+
+            //Assert
+            Assert.IsTrue(response[0] == ") Removed");
         }
 
         [TestMethod]
         public void Remove_RemovesKeyIfLastMember()
         {
+            //Arrange
+            var dictionaryManager = new DictionaryManager();
+            dictionaryManager.Dict.Add("a", new List<string>() { "a" });
 
+            //Act
+            var response = dictionaryManager.Remove("a", "a");
+
+            //Assert
+            Assert.IsTrue(response[0] == ") Removed");
+            Assert.IsFalse(dictionaryManager.Dict.ContainsKey("a"));
         }
 
         [TestMethod]
@@ -120,7 +137,7 @@
             var response = dictionaryManager.Remove("a", "a");
 
             //Assert
-            Assert.IsTrue(response[0] == "ERROR, key does not exist");
+            Assert.IsTrue(response[0] == ") ERROR, key does not exist");
         }
 
         [TestMethod]
@@ -134,7 +151,7 @@
             var response = dictionaryManager.Remove("a", "a");
 
             //Assert
-            Assert.IsTrue(response[0] == "ERROR, member does not exist");
+            Assert.IsTrue(response[0] == ") ERROR, member does not exist");
         }
 
         [TestMethod]
@@ -148,7 +165,7 @@
             var response = dictionaryManager.RemoveAll("a");
 
             //Assert
-            Assert.IsTrue(response[0] == "Removed");
+            Assert.IsTrue(response[0] == ") Removed");
             Assert.IsTrue(dictionaryManager.Dict.Keys.Count == 0);
         }
 
@@ -162,7 +179,7 @@
             var response = dictionaryManager.RemoveAll("a");
 
             //Assert
-            Assert.IsTrue(response[0] == "ERROR, key does not exist");
+            Assert.IsTrue(response[0] == ") ERROR, key does not exist");
         }
 
         [TestMethod]
@@ -177,7 +194,7 @@
             var response = dictionaryManager.Clear();
 
             //Assert
-            Assert.IsTrue(response[0] == "Cleared");
+            Assert.IsTrue(response[0] == ") Cleared");
             Assert.IsTrue(dictionaryManager.Dict.Keys.Count == 0);
         }
 
@@ -249,7 +266,7 @@
             var response = dictionaryManager.AllMembers();
 
             //Assert
-            Assert.IsTrue(response.Contains("a") && response.Contains("b") && response.Contains("c"));
+            Assert.IsTrue(response.Contains("1) a") && response.Contains("2) b") && response.Contains("3) c"));
         }
 
 
@@ -271,13 +288,14 @@
         {
             //Arrange
             var dictionaryManager = new DictionaryManager();
-            dictionaryManager.Dict.Add("a", new List<string>() { "b" });
+            dictionaryManager.Dict.Add("a", new List<string>() { "b", "c" });
 
             //Act
             var response = dictionaryManager.Items();
 
             //Assert
-            Assert.IsTrue(response.Contains("a") && response.Contains("b"));
+            Assert.IsTrue(response.Contains("1) a: b"));
+            Assert.IsTrue(response.Contains("2) a: c"));
         }
 
 

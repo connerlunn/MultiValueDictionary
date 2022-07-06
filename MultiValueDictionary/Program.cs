@@ -3,6 +3,7 @@
     using Microsoft.Extensions.DependencyInjection;
     using MultiValueDictionary.Services;
     using MultiValueDictionary.Managers;
+    using MultiValueDictionary.Utilities;
 
     internal class Program
     {
@@ -12,11 +13,11 @@
 
             services.AddTransient<IDictionaryService, DictionaryService>();
             services.AddTransient<IDictionaryManager, DictionaryManager>();
+            services.AddTransient<IConsoleUtil, ConsoleUtil>();
 
             IServiceProvider serviceProvider = services.BuildServiceProvider();
 
-            // entry to run app 
-            serviceProvider.GetService<IDictionaryService>()!.Run();
+            serviceProvider.GetService<IDictionaryService>()!.Run(false);
         }
     }
 }

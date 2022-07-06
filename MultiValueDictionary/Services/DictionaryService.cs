@@ -1,32 +1,127 @@
 ﻿namespace MultiValueDictionary.Services
 {
     using MultiValueDictionary.Managers;
-    using MultiValueDictionary.DataTypes;
-    using System;
+    using MultiValueDictionary.Utilities;
     using System.Collections.Generic;
 
     public class DictionaryService : IDictionaryService
     {
-        public DictionaryService(IDictionaryManager dictionaryManager)
+        public DictionaryService(IDictionaryManager dictionaryManager, IConsoleUtil console)
         {
             DictionaryManager = dictionaryManager;
+            Console = console;
         }
 
+        private IConsoleUtil Console { get; }
         private IDictionaryManager DictionaryManager { get; }
 
-        public void Run()
+        private readonly Dictionary<string, int> commands = new()
+        {
+            // { <command> , <number of cli arguments> }
+            { "add", 3 },
+            { "allmembers", 1 },
+            { "clear", 1 },
+            { "exit", 1 },
+            { "items", 1 },
+            { "keys", 1 },
+            { "keyexists", 2 },
+            { "members", 2 },
+            { "memberexists", 3 },
+            { "remove", 3 },
+            { "removeall", 2 },
+        };
+
+        private string HowToUseCommand(string command, int argumentCount)
+        {
+            var output = $"How to use: {command}";
+            output = (argumentCount == 2) ? output += " <key>" : output;
+            output = (argumentCount == 3) ? output += " <key> <member>" : output;
+            return output;
+        }
+
+        private List<string>? ValidateInputAndGetResponse(string[] args)
+        {
+            List<string>? output = new();
+
+            // Check input is not empty and has a command as first argument
+            if (args[0] != null && commands.ContainsKey(args[0].ToLower()))
+            {
+                string command = args[0].ToLower();
+
+                // Check command has correct number of inputs
+                if (args.Length == commands[command])
+                {
+                    // Get Response
+                    switch (command)
+                    {
+                        case "exit":
+                            output = null;
+                            break;
+                        case "add":
+                            output = DictionaryManager.Add(args[1], args[2]);
+                            break;
+                        case "members":
+                            output = DictionaryManager.Members(args[1]);
+                            break;
+                        case "allmembers":
+                            output = DictionaryManager.AllMembers();
+                            break;
+                        case "remove":
+                            output = DictionaryManager.Remove(args[1], args[2]);
+                            break;
+                        case "removeall":
+                            output = DictionaryManager.RemoveAll(args[1]);
+                            break;
+                        case "clear":
+                            output = DictionaryManager.Clear();
+                            break;
+                        case "items":
+                            output = DictionaryManager.Items();
+                            break;
+                        case "keys":
+                            output = DictionaryManager.Keys();
+                            break;
+                        case "memberexists":
+                            output = new List<string>() { DictionaryManager.MemberExists(args[1], args[2]).ToString() };
+                            break;
+                        case "keyexists":
+                            output = new List<string>() { DictionaryManager.KeyExists(args[1]).ToString() };
+                            break;
+                    }
+                }
+                else
+                {
+                    output.Add(HowToUseCommand(command, commands[command]));
+                }
+            }
+            else
+            {
+                output.Add("Use one of the following commands.");
+                foreach (string commands in commands.Keys.ToList())
+                {
+                    output.Add(commands);
+                }
+            }
+
+            return output;
+        }
+
+        public void Run(bool singleLoop = false)
         {
             bool proceed = true;
 
             while (proceed)
             {
-                //Gather input
+                // Optional way to run the program with only a single loop
+                proceed = !singleLoop;
+
+                // Gather input
                 string[] consoleArguments = Console.ReadLine()!.Trim().Split(" ");
 
-                //Compute result
+                // Compute result
                 List<string>? output = ValidateInputAndGetResponse(consoleArguments);
 
-                //Display result if output otherwise end program
+                // Display result if output otherwise end program
                 if (output != null)
                 {
                     foreach (string line in output)
@@ -39,76 +134,6 @@
                     proceed = false;
                 }
             }
-        }
-
-        private List<string>? ValidateInputAndGetResponse(string[] args)
-        {
-            List<string>? output = new List<string>();
-
-            //Validate command
-            if (args.Length > 0 && Enum.TryParse(args[0].ToUpper(), out Commands command))
-            {
-                // Validate command inputs and collect output
-                switch (command)
-                {
-                    case Commands.ADD:
-                        output = (args.Length == 3) ? DictionaryManager.Add(args[1], args[2])
-                            : new List<string> { "Invalid input.", "How to use: ADD <key> <member>" };
-                        break;
-                    case Commands.MEMBERS:
-                        output = (args.Length == 2) ? DictionaryManager.Members(args[1])
-                            : new List<string> { "Invalid input.", "How to use: MEMBERS <key>" };
-                        break;
-                    case Commands.ALLMEMBERS:
-                        output = (args.Length == 1) ? DictionaryManager.AllMembers()
-                            : new List<string> { "Invalid input.", "How to use: ALLMEMBERS" };
-                        break;
-                    case Commands.REMOVE:
-                        output = (args.Length == 3) ? DictionaryManager.Remove(args[1], args[2])
-                            : new List<string> { "Invalid input.", "How to use: REMOVE <key> <member>" };
-                        break;
-                    case Commands.REMOVEALL:
-                        output = (args.Length == 2) ? DictionaryManager.RemoveAll(args[1])
-                            : new List<string> { "Invalid input.", "How to use: REMOVEALL <key>" };
-                        break;
-                    case Commands.CLEAR:
-                        output = (args.Length == 1) ? DictionaryManager.Clear()
-                            : new List<string> { "Invalid input.", "How to use: CLEAR" };
-                        break;
-                    case Commands.ITEMS:
-                        output = (args.Length == 1) ? DictionaryManager.Items()
-                            : new List<string> { "Invalid input.", "How to use: ITEMS" };
-                        break;
-                    case Commands.KEYS:
-                        output = (args.Length == 1) ? DictionaryManager.Keys()
-                            : new List<string> { "Invalid input.", "How to use: KEYS" };
-                        break;
-                    case Commands.KEYEXISTS:
-                        output = (args.Length == 2) ? new List<string>() { DictionaryManager.KeyExists(args[1]).ToString() }
-                            : new List<string> { "Invalid input.", "How to use: KEYEXISTS <key>" };
-                        break;
-                    case Commands.MEMBEREXISTS:
-                        output = (args.Length == 3) ? new List<string>() { DictionaryManager.MemberExists(args[1], args[2]).ToString() }
-                            : new List<string> { "Invalid input.", "How to use: MEMBEREXISTS <key> <member>" };
-                        break;
-                    case Commands.EXIT:
-                        //Trigger exit condition
-                        output = null;
-                        break;
-                    default:
-                        break;
-                }
-            }
-            else
-            {
-                output.Add("Invalid input. Please use one of the following commands.");
-                foreach (Commands commands in Enum.GetValues(typeof(Commands)))
-                {
-                    output.Add(commands.ToString());
-                }
-            }
-
-            return output;
         }
     }
 }

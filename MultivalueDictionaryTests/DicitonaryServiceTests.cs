@@ -23,6 +23,9 @@ namespace MultivalueDictionaryTests
             dictionaryService.Run(false);
 
             // Assert
+            // This may seem like a pointless test but if EXIT command
+            // is not working properly then dictionaryService.Run(false) will
+            // not finish and never reach this Assert
             Assert.IsTrue(true);
         }
 
